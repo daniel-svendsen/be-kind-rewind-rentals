@@ -2,6 +2,8 @@ package se.yrgo.domain;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Movie {
 
@@ -13,6 +15,9 @@ public class Movie {
     private String genre;
 
     private int releaseYear;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MovieInventory> inventory;
 
     public Movie() {
 
