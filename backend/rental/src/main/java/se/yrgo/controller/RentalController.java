@@ -24,8 +24,10 @@ public class RentalController {
     }
 
     @GetMapping
-    public List<Rental> getAllRentals() {
-        return rentalService.getAllRentals();
+    public List<RentalDTO> getAllRentals() {
+        return rentalService.getAllRentals().stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -34,23 +36,6 @@ public class RentalController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-//    @PostMapping
-//    public Rental createRental(@RequestBody Rental rental) {
-//        rental.getRentalItems().forEach(item -> {
-//            // Sätt referensen till Rental för varje RentalItem
-//            item.setRental(rental);
-//
-//            // Kontrollera att priset inte är null
-//            if (item.getPrice() == null) {
-//                throw new IllegalArgumentException("Price for rental item cannot be null");
-//            }
-//        });
-//
-//        Rental createdRental = rentalService.createRental(rental);
-//        rentalProducer.sendMessage("rental.queue", "New rental created with ID: " + createdRental.getId());
-//        return createdRental;
-//    }
 
     @PostMapping
     public RentalDTO createRental(@RequestBody Rental rental) {
