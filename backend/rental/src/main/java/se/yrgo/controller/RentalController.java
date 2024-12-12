@@ -3,6 +3,10 @@ package se.yrgo.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import se.yrgo.domain.Rental;
+import se.yrgo.domain.RentalItem;
+import se.yrgo.dto.RentalDTO;
+import se.yrgo.dto.RentalItemDTO;
+import se.yrgo.messaging.RentalProducer;
 import se.yrgo.rest.RentalService;
 
 import java.util.List;
@@ -12,9 +16,11 @@ import java.util.List;
 public class RentalController {
 
     private final RentalService rentalService;
+    private final RentalProducer rentalProducer;
 
-    public RentalController(RentalService rentalService) {
+    public RentalController(RentalService rentalService, RentalProducer rentalProducer) {
         this.rentalService = rentalService;
+        this.rentalProducer = rentalProducer;
     }
 
     @GetMapping
@@ -29,9 +35,62 @@ public class RentalController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+//    @PostMapping
+//    public Rental createRental(@RequestBody Rental rental) {
+//        rental.getRentalItems().forEach(item -> {
+//            // Sätt referensen till Rental för varje RentalItem
+//            item.setRental(rental);
+//
+//            // Kontrollera att priset inte är null
+//            if (item.getPrice() == null) {
+//                throw new IllegalArgumentException("Price for rental item cannot be null");
+//            }
+//        });
+//
+//        Rental createdRental = rentalService.createRental(rental);
+//        rentalProducer.sendMessage("rental.queue", "New rental created with ID: " + createdRental.getId());
+//        return createdRental;
+//    }
+
     @PostMapping
-    public Rental createRental(@RequestBody Rental rental) {
-        return rentalService.createRental(rental);
+    public RentalDTO createRental(@RequestBody Rental rental) {
+        try {
+            rental.getRentalItems().forEach(item -> {
+                item.setRental(rental);
+                if (item.getPrice() == null) {
+                    throw new IllegalArgumentException("Price for rental item cannot be null");
+                }
+            });
+
+            Rental createdRental = rentalService.createRental(rental);
+            rentalProducer.sendMessage("rental.queue", "New rental created with ID: " + createdRental.getId());
+
+            return convertToDTO(createdRental);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid rental data: " + e.getMessage());
+        }
+    }
+
+    private RentalDTO convertToDTO(Rental rental) {
+        RentalDTO rentalDTO = new RentalDTO();
+        rentalDTO.setId(rental.getId());
+        rentalDTO.setCustomerId(rental.getCustomerId());
+        rentalDTO.setRentalDate(rental.getRentalDate());
+        rentalDTO.setReturnDate(rental.getReturnDate());
+        rentalDTO.setTotalCost(rental.getTotalCost());
+
+        List<RentalItemDTO> itemDTOs = rental.getRentalItems().stream()
+                .map(item -> {
+                    RentalItemDTO itemDTO = new RentalItemDTO();
+                    itemDTO.setProductId(item.getProductId());
+                    itemDTO.setQuantity(item.getQuantity());
+                    itemDTO.setPrice(item.getPrice());
+                    return itemDTO;
+                })
+                .toList();
+
+        rentalDTO.setRentalItems(itemDTOs);
+        return rentalDTO;
     }
 
     @PutMapping("/{id}")

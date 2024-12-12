@@ -29,5 +29,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+FCL.java
+FCL.txt
+
 ### VS Code ###
 .vscode/
