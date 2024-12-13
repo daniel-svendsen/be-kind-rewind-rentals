@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import se.yrgo.data.RentalRepository;
 import se.yrgo.domain.Rental;
 import se.yrgo.domain.RentalItem;
+import se.yrgo.messaging.RentalProducer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
+    private final RentalProducer rentalProducer;
 
-    public RentalServiceImpl(RentalRepository rentalRepository) {
+    public RentalServiceImpl(RentalRepository rentalRepository, RentalProducer rentalProducer) {
         this.rentalRepository = rentalRepository;
+        this.rentalProducer = rentalProducer;
     }
 
     @Override
@@ -34,6 +37,7 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = new Rental();
         rental.setCustomerId(customerId);
         rental.setRentalDate(LocalDate.now());
+        rental.setReturnDate(LocalDate.now().plusDays(7)); // Sätter returnDate till 7 dagar senare
         rental.setTotalCost(100.0); // Standardpris
 
         // Skapa en ny RentalItem
@@ -42,12 +46,17 @@ public class RentalServiceImpl implements RentalService {
         item.setQuantity(1);
         item.setPrice(100.0);
 
-        // Koppla ihop RentalItem med Rental
         item.setRental(rental);
         rental.setRentalItems(List.of(item));
 
-        // Spara uthyrningen
-        return rentalRepository.save(rental);
+        Rental savedRental = rentalRepository.save(rental);
+
+        // Skicka meddelande till ActiveMQ
+        String message = String.format("Rental created: Customer ID %d, Movie ID %d, Rental ID %d",
+                customerId, movieId, savedRental.getId());
+        rentalProducer.sendMessage("rental.queue", message);
+
+        return savedRental;
     }
 
     @Override
