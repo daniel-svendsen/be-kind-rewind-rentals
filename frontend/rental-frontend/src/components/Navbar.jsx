@@ -5,7 +5,7 @@ const Navbar = () => {
     return (
         <nav className="bg-gray-800 text-white p-4">
             <div className="container mx-auto flex justify-between">
-                <h1 className="text-xl font-bold">Film Rental</h1>
+                <h1 className="text-xl font-bold">Be Kind Rewind Rentals</h1>
                 <ul className="flex space-x-4">
                     <li><Link to="/" className="hover:underline">Home</Link></li>
                     <li><Link to="/rentals" className="hover:underline">Rentals</Link></li>
