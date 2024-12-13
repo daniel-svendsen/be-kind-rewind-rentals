@@ -3,11 +3,9 @@ package se.yrgo.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import se.yrgo.domain.Rental;
-import se.yrgo.domain.RentalItem;
 import se.yrgo.dto.RentalDTO;
 import se.yrgo.dto.RentalItemDTO;
-import se.yrgo.messaging.RentalProducer;
-import se.yrgo.rest.RentalService;
+import se.yrgo.service.RentalService;
 
 import java.util.List;
 
@@ -16,11 +14,9 @@ import java.util.List;
 public class RentalController {
 
     private final RentalService rentalService;
-    private final RentalProducer rentalProducer;
 
-    public RentalController(RentalService rentalService, RentalProducer rentalProducer) {
+    public RentalController(RentalService rentalService) {
         this.rentalService = rentalService;
-        this.rentalProducer = rentalProducer;
     }
 
     @GetMapping
@@ -31,51 +27,30 @@ public class RentalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Rental> getRentalById(@PathVariable Long id) {
+    public ResponseEntity<RentalDTO> getRentalById(@PathVariable Long id) {
         return rentalService.getRentalById(id)
-                .map(ResponseEntity::ok)
+                .map(rental -> ResponseEntity.ok(convertToDTO(rental)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public RentalDTO createRental(@RequestBody Rental rental) {
+    @PostMapping("/create")
+    public ResponseEntity<RentalDTO> createRental(@RequestParam Long customerId, @RequestParam Long movieId) {
         try {
-            rental.getRentalItems().forEach(item -> {
-                item.setRental(rental);
-                if (item.getPrice() == null) {
-                    throw new IllegalArgumentException("Price for rental item cannot be null");
-                }
-            });
-
-            Rental createdRental = rentalService.createRental(rental);
-            rentalProducer.sendMessage("rental.queue", "New rental created with ID: " + createdRental.getId());
-
-            return convertToDTO(createdRental);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid rental data: " + e.getMessage());
+            Rental createdRental = rentalService.createRental(customerId, movieId);
+            return ResponseEntity.ok(convertToDTO(createdRental));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
-    private RentalDTO convertToDTO(Rental rental) {
-        RentalDTO rentalDTO = new RentalDTO();
-        rentalDTO.setId(rental.getId());
-        rentalDTO.setCustomerId(rental.getCustomerId());
-        rentalDTO.setRentalDate(rental.getRentalDate());
-        rentalDTO.setReturnDate(rental.getReturnDate());
-        rentalDTO.setTotalCost(rental.getTotalCost());
-
-        List<RentalItemDTO> itemDTOs = rental.getRentalItems().stream()
-                .map(item -> {
-                    RentalItemDTO itemDTO = new RentalItemDTO();
-                    itemDTO.setProductId(item.getProductId());
-                    itemDTO.setQuantity(item.getQuantity());
-                    itemDTO.setPrice(item.getPrice());
-                    return itemDTO;
-                })
-                .toList();
-
-        rentalDTO.setRentalItems(itemDTOs);
-        return rentalDTO;
+    @DeleteMapping("/end/{id}")
+    public ResponseEntity<Void> endRental(@PathVariable Long id) {
+        try {
+            rentalService.endRental(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -89,7 +64,32 @@ public class RentalController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRental(@PathVariable Long id) {
-        rentalService.deleteRental(id);
-        return ResponseEntity.noContent().build();
+        try {
+            rentalService.deleteRental(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private RentalDTO convertToDTO(Rental rental) {
+        RentalDTO rentalDTO = new RentalDTO();
+        rentalDTO.setId(rental.getId());
+        rentalDTO.setCustomerId(rental.getCustomerId());
+        rentalDTO.setRentalDate(rental.getRentalDate());
+        rentalDTO.setReturnDate(rental.getReturnDate());
+        rentalDTO.setTotalCost(rental.getTotalCost());
+
+        rentalDTO.setRentalItems(
+                rental.getRentalItems().stream().map(item -> {
+                    RentalItemDTO itemDTO = new RentalItemDTO();
+                    itemDTO.setProductId(item.getProductId());
+                    itemDTO.setQuantity(item.getQuantity());
+                    itemDTO.setPrice(item.getPrice());
+                    return itemDTO;
+                }).toList()
+        );
+
+        return rentalDTO;
     }
 }
