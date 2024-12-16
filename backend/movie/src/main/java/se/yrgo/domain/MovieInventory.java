@@ -11,7 +11,7 @@ public class MovieInventory {
     @JoinColumn(name = "movieId", nullable = false)
     private Movie movie;
     private int stock;
-    private String store;
+
 
     public MovieInventory() {
 
@@ -46,13 +46,6 @@ public class MovieInventory {
         this.stock = stock;
     }
 
-    public String getStore() {
-        return store;
-    }
-
-    public void setStore(String store) {
-        this.store = store;
-    }
 
     @Override
     public String toString() {
@@ -60,7 +53,6 @@ public class MovieInventory {
                 "id=" + id +
                 ", movie=" + movie +
                 ", stock=" + stock +
-                ", store='" + store + '\'' +
                 '}';
     }
 }

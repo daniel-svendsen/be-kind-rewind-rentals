@@ -3,6 +3,7 @@ package se.yrgo.domain;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Movie {
@@ -18,10 +19,6 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieInventory> inventory;
-
-    public Movie() {
-
-    }
 
     public long getId() {
         return id;
@@ -55,10 +52,27 @@ public class Movie {
         this.releaseYear = releaseYear;
     }
 
+    public void setInventory(List<MovieInventory> inventory) {
+        this.inventory = inventory;
+    }
+
     @Override
     public String toString() {
         return "Movie{" +
                 "title='" + title + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return id == movie.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
