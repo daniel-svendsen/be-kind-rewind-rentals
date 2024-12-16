@@ -20,10 +20,6 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieInventory> inventory;
 
-    public Movie() {
-
-    }
-
     public long getId() {
         return id;
     }
@@ -54,6 +50,10 @@ public class Movie {
 
     public void setReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
+    }
+
+    public void setInventory(List<MovieInventory> inventory) {
+        this.inventory = inventory;
     }
 
     @Override
