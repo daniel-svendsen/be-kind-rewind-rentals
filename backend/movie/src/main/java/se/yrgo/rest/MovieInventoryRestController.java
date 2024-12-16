@@ -12,7 +12,7 @@ import se.yrgo.domain.MovieInventory;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/inventory")
 public class MovieInventoryRestController {
     @Autowired
     private MovieInventoryRepository data;

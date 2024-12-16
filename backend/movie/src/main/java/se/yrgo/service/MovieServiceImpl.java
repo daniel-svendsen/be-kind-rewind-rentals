@@ -47,5 +47,20 @@ public class MovieServiceImpl implements MovieService {
         movieRepository.deleteById(id);
     }
 
+    @Override
+    public List<Movie> searchMoviesByTitle(String title) {
+        return movieRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
+    public List<Movie> searchMoviesByGenre(String genre) {
+        return movieRepository.findByGenreIgnoreCase(genre);
+    }
+
+    @Override
+    public List<Movie> searchMovieByReleaseYear(int releaseYear) {
+        return movieRepository.findByReleaseYear(releaseYear);
+    }
+
 
 }

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/movies")
+@RequestMapping("/movies")
 public class MovieRestController {
     @Autowired
     private MovieService movieService;
@@ -57,4 +57,10 @@ public class MovieRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/search")
+    public List<Movie> searchMovies(@RequestParam String title) {
+        return movieService.searchMoviesByTitle(title);
+    }
+
 }

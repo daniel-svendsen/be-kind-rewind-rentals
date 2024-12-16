@@ -11,4 +11,7 @@ public interface MovieService {
     public Movie createMovie(Movie movie);
     public Movie updateMovie(Long id, Movie updatedMovie);
     public void deleteMovie(Long id);
+    List<Movie> searchMoviesByTitle(String title);
+    List<Movie> searchMoviesByGenre(String genre);
+    List<Movie> searchMovieByReleaseYear(int releaseYear);
 }
