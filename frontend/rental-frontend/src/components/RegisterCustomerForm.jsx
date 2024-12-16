@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import axios from "axios";
 
 function RegisterForm() {
     const [name, setName] = useState('');
@@ -9,10 +10,27 @@ function RegisterForm() {
     const [city, setCity] = useState('');
 
     const handleSubmit = (event) => {
-        event.preventDefault();
-        // Add your registration logic here
-        console.log({username: name, realname: email});
-    };
+        //event.preventDefault();
+
+        const data = {
+            name: name,
+            email: email,
+            phone: phone,
+            address: {
+                street: street,
+                zipCode: zipcode,
+                city: city
+            }
+        }
+        axios
+            .post('http://localhost:8083/customers', data)
+            .then((response) => {
+                console.log("Customer created successfully:", response.data);
+            })
+            .catch((error) => {
+                console.error("There was an error creating the customer:", error);
+            });
+    }
 
     return (
         <div className="bg-white shadow-lg rounded-lg p-6">
@@ -26,7 +44,7 @@ function RegisterForm() {
                     className="p-4 border rounded-lg text-left transition-all bg-gray-100 hover"
                 />
                 <input
-                    type="text"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
@@ -60,13 +78,15 @@ function RegisterForm() {
                     placeholder="City"
                     className="p-4 border rounded-lg text-left transition-all bg-gray-100 hover"
                 />
-                <input type="submit"
-                       value="Register"
-                       className={`btn btn-primary px-6 py-3 rounded-lg text-lg font-semibold transition-all ${
-                           name && email && phone && street && zipcode && city
-                               ? "bg-green-500 text-white hover:bg-green-600"
-                               : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                       }`} disabled={!name || !email || !phone || !street || !zipcode || !city}/>
+                <div className="flex">
+                    <input type="submit"
+                           value="Register"
+                           className={`btn btn-primary px-6 py-3 rounded-lg text-lg font-semibold transition-all ${
+                               name && email && phone && street && zipcode && city
+                                   ? "bg-green-500 text-white hover:bg-green-600"
+                                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                           }`} disabled={!name || !email || !phone || !street || !zipcode || !city}/>
+                </div>
             </form>
         </div>
     );
