@@ -5,7 +5,7 @@ const Movies = () => {
     const [movies, setMovies] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8082/api/movies')
+        axios.get('http://localhost:8082/movies')
             .then(response => setMovies(response.data))
             .catch(error => console.error('Error fetching movies:', error));
     }, []);

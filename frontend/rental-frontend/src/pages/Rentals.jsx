@@ -11,7 +11,7 @@ const Rentals = () => {
 
     useEffect(() => {
         axios.get("http://localhost:8083/customers").then((res) => setCustomers(res.data));
-        axios.get("http://localhost:8081/api/movies").then((res) => setMovies(res.data));
+        axios.get("http://localhost:8081/movies").then((res) => setMovies(res.data));
         axios.get("http://localhost:8082/rentals").then((res) => setRentals(res.data));
     }, []);
 
