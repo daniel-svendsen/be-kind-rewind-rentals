@@ -23,9 +23,9 @@ Detta kommando:
 - Länkar dem i ett gemensamt nätverk.
 
 ### 3. Verifiera tjänsterna
-- **Movie-tjänsten**: [http://localhost:8081](http://localhost:8081)
-- **Customer-tjänsten**: [http://localhost:8083](http://localhost:8083)
-- **Rental-tjänsten**: [http://localhost:8082](http://localhost:8082)
+- **Movie-tjänsten**: [http://localhost:8081](http://localhost:8081/movies)
+- **Customer-tjänsten**: [http://localhost:8083](http://localhost:8083/customers)
+- **Rental-tjänsten**: [http://localhost:8082](http://localhost:8082/rentals)
 - **ActiveMQ Admin Console**: [http://localhost:8161](http://localhost:8161)
   - Inloggning: **admin** / **admin**
 
