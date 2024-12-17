@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  movie:
+    build:
+      context: ./movie
+      dockerfile: Dockerfile
+    container_name: movie_service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/movieDB
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD:
+      SPRING_APPLICATION_NAME: movie
+      SERVER_PORT: 8081
+    volumes:
+      - movie-db:/data
+    networks:
+      - app-network
+
+  customer:
+    build:
+      context: ./customer
+      dockerfile: Dockerfile
+    container_name: customer_service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/customerDB
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD:
+      SPRING_APPLICATION_NAME: customer
+      SERVER_PORT: 8083
+    volumes:
+      - customer-db:/data
+    networks:
+      - app-network
+
+  rental:
+    build:
+      context: ./rental
+      dockerfile: Dockerfile
+    container_name: rental_service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/rentalDB
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD:
+      SPRING_APPLICATION_NAME: rental
+      SERVER_PORT: 8082
+      SPRING_ACTIVEMQ_BROKER-URL: tcp://activemq:61616
+      SPRING_ACTIVEMQ_USER: admin
+      SPRING_ACTIVEMQ_PASSWORD: admin
+    volumes:
+      - rental-db:/data
+    depends_on:
+      - activemq
+    networks:
+      - app-network
+
+  activemq:
+    image: webcenter/activemq:latest
+    container_name: activemq
+    ports:
+      - "61616:61616" # Transport port
+      - "8161:8161"   # Admin console
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+    networks:
+      - app-network
+
+volumes:
+  movie-db:
+  customer-db:
+  rental-db:
+
+networks:
+  app-network:
