@@ -22,7 +22,18 @@ Detta kommando:
 - Startar **movie**, **customer**, **rental** och **activemq** containrarna.
 - Länkar dem i ett gemensamt nätverk.
 
-### 3. Verifiera tjänsterna
+### 3. Starta frontend-delen
+Navigera till **/frontend/rental-frontend** och kör följande kommandon:
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend kommer att vara tillgänglig på:
+[http://localhost:5173](http://localhost:5173)
+
+### 4. Verifiera tjänsterna
 - **Movie-tjänsten**: [http://localhost:8081](http://localhost:8081/movies)
 - **Customer-tjänsten**: [http://localhost:8083](http://localhost:8083/customers)
 - **Rental-tjänsten**: [http://localhost:8082](http://localhost:8082/rentals)
@@ -72,6 +83,11 @@ backend/
 └── rental/
     └── Dockerfile          # Bygger Rental-tjänsten
     └── src/               # Rental-källkod
+
+frontend/
+└── rental-frontend/        # Frontend-delen
+    ├── package.json
+    └── src/                # Frontend-källkod
 ```
 
 ---
@@ -81,6 +97,12 @@ backend/
 ### Bygg och starta containrarna:
 ```bash
 docker-compose up --build
+```
+
+### Starta frontend:
+```bash
+npm install
+npm run dev
 ```
 
 ### Stoppa och ta bort alla containrar:
@@ -102,7 +124,7 @@ docker system prune -a
 ---
 
 ## Felsökning
-1. **Portkonflikter**: Se till att portarna 8081, 8082, 8083 och 8161 inte används av andra tjänster.
+1. **Portkonflikter**: Se till att portarna 8081, 8082, 8083, 8161 och 5173 inte används av andra tjänster.
 2. **AktivMQ-anslutning**: Kontrollera ActiveMQ Admin Console på [http://localhost:8161](http://localhost:8161).
 3. **Build-fel**: Bygg om allt med:
    ```bash
@@ -119,10 +141,19 @@ För att bygga och köra projektet:
 ```bash
 docker-compose up --build
 ```
+
+För att starta frontend:
+```bash
+npm install
+npm run dev
+```
+
 För att starta det igen:
 ```bash
 docker-compose up
 ```
+
 För att stoppa allt:
 ```bash
 docker-compose down
+```
