@@ -1,5 +1,6 @@
 package se.yrgo.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class Movie {
 
     private int releaseYear;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieInventory> inventory;
 
@@ -56,10 +58,19 @@ public class Movie {
         this.inventory = inventory;
     }
 
+    public List<MovieInventory> getInventory() {
+        return inventory;
+    }
+
+
     @Override
     public String toString() {
         return "Movie{" +
-                "title='" + title + '\'' +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", genre='" + genre + '\'' +
+                ", releaseYear=" + releaseYear +
+                ", inventory=" + inventory +
                 '}';
     }
 

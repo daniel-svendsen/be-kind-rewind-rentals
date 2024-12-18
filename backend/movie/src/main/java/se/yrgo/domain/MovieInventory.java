@@ -1,5 +1,6 @@
 package se.yrgo.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,6 +10,7 @@ public class MovieInventory {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "movieId", nullable = false)
+    @JsonBackReference
     private Movie movie;
     private int stock;
 
