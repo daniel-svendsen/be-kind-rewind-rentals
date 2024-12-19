@@ -60,12 +60,11 @@ docker-compose down
 
 ## H2-databasens lagring
 
-- Varje tjänst lagrar sin H2-databas i en Docker-volym:
-  - **Movie**: `movie-db`
-  - **Customer**: `customer-db`
-  - **Rental**: `rental-db`
-
-Dessa volymer sparar databasen även om containern stoppas.
+All lagring sker till databasfiler.
+Varje microtjänst har en egen fil.
+Docker containern läser och skriver till respektive fil. 
+Alla ändringar är permanenta och sparas även om docker 
+containern stängs ner.
 
 ---
 
