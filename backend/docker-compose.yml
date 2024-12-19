@@ -47,8 +47,9 @@ services:
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/rentalDB
-      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/Database
+      SPRING_DATASOURCE_USERNAME:
       SPRING_DATASOURCE_PASSWORD:
       SPRING_APPLICATION_NAME: rental
       SERVER_PORT: 8082
@@ -56,7 +57,7 @@ services:
       SPRING_ACTIVEMQ_USER: admin
       SPRING_ACTIVEMQ_PASSWORD: admin
     volumes:
-      - rental-db:/data
+      - ./rental:/data
     depends_on:
       - activemq
     networks:
@@ -74,8 +75,7 @@ services:
     networks:
       - app-network
 
-volumes:
-  rental-db:
+
 
 networks:
   app-network:
